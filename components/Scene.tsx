@@ -9,6 +9,7 @@ import { AudioManager } from '../services/audioManager';
 interface SceneProps {
   audioManager: AudioManager;
   isTalking: boolean;
+  avatarUrl: string;
 }
 
 // --- Space Elements ---
@@ -77,7 +78,7 @@ const Nebula = () => {
 
 // --- Main Scene ---
 
-export const Scene: React.FC<SceneProps> = ({ audioManager, isTalking }) => {
+export const Scene: React.FC<SceneProps> = ({ audioManager, isTalking, avatarUrl }) => {
   return (
     <Canvas
       // Adjusted Camera: Positioned to frame the upper body of the large avatar
@@ -107,7 +108,7 @@ export const Scene: React.FC<SceneProps> = ({ audioManager, isTalking }) => {
         {/* Avatar group is now handled cleanly in Avatar.tsx position, 
             but we wrap it here for potential future scene offsets */}
         <group> 
-             <Avatar audioManager={audioManager} isTalking={isTalking} />
+             <Avatar audioManager={audioManager} isTalking={isTalking} avatarUrl={avatarUrl} />
         </group>
         
         {/* Environment Reflections */}

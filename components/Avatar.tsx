@@ -7,14 +7,15 @@ import { AudioManager } from '../services/audioManager';
 interface AvatarProps {
   audioManager: AudioManager;
   isTalking: boolean;
+  avatarUrl: string;
 }
 
 // Using a standard Ready Player Me avatar. 
 // These GLBs usually come with 'viseme_XX' or 'mouthOpen' morph targets.
-const MODEL_URL = "https://models.readyplayer.me/64e3055495439dfcf3f0b665.glb";
+const DEFAULT_MODEL_URL = "https://models.readyplayer.me/64e3055495439dfcf3f0b665.glb";
 
-export const Avatar: React.FC<AvatarProps> = ({ audioManager, isTalking }) => {
-  const { scene } = useGLTF(MODEL_URL);
+export const Avatar: React.FC<AvatarProps> = ({ audioManager, isTalking, avatarUrl }) => {
+  const { scene } = useGLTF(avatarUrl || DEFAULT_MODEL_URL);
   const { nodes } = useGraph(scene);
   const headMeshRef = useRef<THREE.SkinnedMesh | null>(null);
   const bodyMeshRef = useRef<THREE.SkinnedMesh | null>(null);
@@ -127,4 +128,5 @@ export const Avatar: React.FC<AvatarProps> = ({ audioManager, isTalking }) => {
   );
 };
 
-useGLTF.preload(MODEL_URL);
+useGLTF.preload(DEFAULT_MODEL_URL);
+useGLTF.preload(DEFAULT_MODEL_URL);

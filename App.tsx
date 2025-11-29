@@ -16,6 +16,7 @@ export default function App() {
   const [isRecording, setIsRecording] = useState(false);
   const [isTalking, setIsTalking] = useState(false);
   const [asrActive, setAsrActive] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string>("https://models.readyplayer.me/64e3055495439dfcf3f0b665.glb");
   
   const wsRef = useRef<WebSocket | null>(null);
   // Track if we are currently playing audio to show "Talking" state
@@ -179,7 +180,7 @@ export default function App() {
     <div className="w-full h-screen bg-black relative overflow-hidden">
       {/* 3D Scene Background */}
       <div className="absolute inset-0 z-0">
-        <Scene audioManager={audioManager} isTalking={isTalking} />
+        <Scene audioManager={audioManager} isTalking={isTalking} avatarUrl={avatarUrl} />
       </div>
 
       {/* UI Overlay */}
@@ -187,9 +188,11 @@ export default function App() {
         messages={messages}
         isConnected={isConnected}
         isRecording={isRecording}
+        avatarUrl={avatarUrl}
         onConnect={connect}
         onToggleRecord={toggleRecording}
         onSendText={sendText}
+        onUpdateAvatar={setAvatarUrl}
       />
     </div>
   );
