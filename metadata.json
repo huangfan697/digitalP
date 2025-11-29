@@ -1,0 +1,7 @@
+{
+  "name": "CyberAvatar Agent Interface",
+  "description": "A futuristic 3D interface for the Avatar Agent backend with real-time lip-sync and voice interaction.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
