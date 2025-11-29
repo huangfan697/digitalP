@@ -10,7 +10,6 @@ export class AudioManager {
   private analyser: AnalyserNode | null = null;
   private dataArray: Uint8Array | null = null;
   private gainNode: GainNode | null = null;
-  private prevEnergy: number = 0;
 
   // Recording
   private mediaStream: MediaStream | null = null;
@@ -27,7 +26,7 @@ export class AudioManager {
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
     this.audioContext = new AudioContextClass({ sampleRate: 16000 }); // Match backend if possible, or resample
     this.analyser = this.audioContext.createAnalyser();
-    this.analyser.fftSize = 1024; // larger window to smooth low freq speech energy
+    this.analyser.fftSize = 256;
     this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
     
     this.gainNode = this.audioContext.createGain();
@@ -76,26 +75,17 @@ export class AudioManager {
 
   // Get current volume energy (0.0 to 1.0) for lip sync
   getVolume(): number {
-    if (!this.analyser) return 0;
-
-    // Use time-domain RMS for smoother mouth movement
-    const timeDomain = new Uint8Array(this.analyser.fftSize);
-    this.analyser.getByteTimeDomainData(timeDomain);
-
-    let sumSquares = 0;
-    for (let i = 0; i < timeDomain.length; i++) {
-      const v = (timeDomain[i] - 128) / 128; // normalize -1..1
-      sumSquares += v * v;
+    if (!this.analyser || !this.dataArray) return 0;
+    this.analyser.getByteFrequencyData(this.dataArray);
+    
+    let sum = 0;
+    // Focus on lower speech frequencies
+    const limit = Math.floor(this.dataArray.length / 2); 
+    for(let i = 0; i < limit; i++) {
+        sum += this.dataArray[i];
     }
-    const rms = Math.sqrt(sumSquares / timeDomain.length);
-
-    // Smooth with simple low-pass filter
-    const alpha = 0.25; // lower = smoother
-    this.prevEnergy = this.prevEnergy * (1 - alpha) + rms * alpha;
-
-    // Map to 0..1, with a slight gain
-    const energy = Math.min(1, this.prevEnergy * 4.5);
-    return energy;
+    const average = sum / limit;
+    return Math.min(1, average / 100); // Normalize roughly
   }
 
   // --- Recording Logic ---
