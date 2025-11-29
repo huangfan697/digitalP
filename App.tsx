@@ -22,12 +22,19 @@ export default function App() {
   const speakingTimeoutRef = useRef<number | null>(null);
 
   const addMessage = (role: Role, text: string) => {
-    setMessages(prev => [...prev, {
-      id: Math.random().toString(36).substr(2, 9),
-      role,
-      text,
-      timestamp: new Date()
-    }]);
+    // avoid immediate duplicates of same role/text
+    setMessages(prev => {
+      const last = prev[prev.length - 1];
+      if (last && last.role === role && last.text === text) {
+        return prev;
+      }
+      return [...prev, {
+        id: Math.random().toString(36).substr(2, 9),
+        role,
+        text,
+        timestamp: new Date()
+      }];
+    });
   };
 
   const connect = async () => {
@@ -108,7 +115,7 @@ export default function App() {
 
   const sendText = async (text: string) => {
     if (!text.trim()) return;
-    
+
     addMessage('user', text);
 
     // Option 1: Send via WebSocket if open (Preferred as it triggers full pipeline with streaming)
